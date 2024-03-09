@@ -1,7 +1,38 @@
 services:
   postgresql:
+    container_name: erpDB
     image: postgres:9.6
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend
+  nest-js:
+    container_name: erpAPI
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env
     ports:
-      - '5432:5432'
+      - '4000:4000'
+    volumes:
+      - .:/app
+    networks:
+      - backend
+    depends_on:
+      - postgresql
+    command: npm run dev
+volumes:
+  postgres-data:
+
+networks:
+  backend:
+    driver: bridge
