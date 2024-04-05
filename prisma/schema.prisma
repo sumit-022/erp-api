@@ -13,11 +13,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Gender {
+  Female
+  Male
+}
+
 model User {
-  id       String   @id @default(uuid())
-  username String   @unique
-  email    String   @unique
+  id       String    @id @default(uuid())
+  username String    @unique
+  email    String    @unique
   name     String
   password String
-  verified Boolean  @default(false)
+  verified Boolean   @default(false)
+  gender   Gender
+  Company  Company[]
+}
+
+enum CompanyType {
+  Product
+  Service
+}
+
+model Company {
+  id          String      @id @default(uuid())
+  name        String
+  address     String
+  email       String
+  contact     String
+  gstin       String
+  companyType CompanyType
+  logo        String
+  website     String
+  owner       User        @relation(fields: [ownerId], references: [id])
+  ownerId     String
 }

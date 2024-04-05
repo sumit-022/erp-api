@@ -32,12 +32,14 @@ export class AuthService {
   }
 
   async register(data: RegisterDto) {
+    const { name, username, email, gender } = data;
     const password = await hash(data.password, 10);
     const user = await this.prisma.user.create({
       data: {
-        name: data.name,
-        username: data.username,
-        email: data.email,
+        name,
+        username,
+        email,
+        gender,
         password,
       },
     });
