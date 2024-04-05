@@ -46,4 +46,5 @@ model Company {
   website     String
   owner       User        @relation(fields: [ownerId], references: [id])
   ownerId     String
+  avatar   String?
 }
