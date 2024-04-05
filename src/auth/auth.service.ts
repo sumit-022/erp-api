@@ -14,7 +14,9 @@ export class AuthService {
   ) {}
   async login(data: LoginDto) {
     const user = await this.prisma.user.findUnique({
-      where: { email: data.email },
+      where: {
+        email: data.identifier,
+      },
     });
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -34,6 +36,7 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         name: data.name,
+        username: data.username,
         email: data.email,
         password,
       },

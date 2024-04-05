@@ -32,6 +32,8 @@ export class AuthController {
         } else {
           throw new ForbiddenException('Something went wrong');
         }
+      } else {
+        throw new ForbiddenException('Something went wrong');
       }
     }
   }
@@ -52,11 +54,13 @@ export class AuthController {
         } else {
           throw new ForbiddenException('Something went wrong');
         }
+      } else {
+        throw new ForbiddenException('Something went wrong');
       }
     }
   }
 
-  @Post('vaidate')
+  @Post('validate')
   async validate(@Req() req: Request, @Res() res: Response) {
     try {
       const data = await this.authService.validateAccessToken(

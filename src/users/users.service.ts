@@ -34,4 +34,18 @@ export class UsersService {
       where: { id },
     });
   }
+  async removeAll(magicWord: string) {
+    if (magicWord === 'please') {
+      return this.prisma.user.deleteMany();
+    } else {
+      throw new Error('Magic word is incorrect');
+    }
+  }
+
+  async usernameExists(username: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { username },
+    });
+    return !!user;
+  }
 }
