@@ -19,34 +19,48 @@ export class AuthService {
       },
     });
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Account not found');
     }
     const isPasswordValid = await compare(data.password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Invalid Password');
     }
-    const payload = { sub: user.id, email: user.email, name: user.name };
+    const payload = { id: user.id, email: user.email, name: user.name };
     return {
       access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+      },
     };
   }
 
   async register(data: RegisterDto) {
-    const { name, username, email, gender } = data;
-    const password = await hash(data.password, 10);
-    const user = await this.prisma.user.create({
-      data: {
-        name,
-        username,
-        email,
-        gender,
-        password,
-      },
-    });
-    const payload = { sub: user.id, email: user.email, name: user.name };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    try {
+      const { name, username, email } = data;
+      const password = await hash(data.password, 10);
+      const user = await this.prisma.user.create({
+        data: {
+          name,
+          username,
+          email,
+          password,
+        },
+      });
+      const payload = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        username: user.username,
+      };
+      return {
+        access_token: this.jwtService.sign(payload),
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid data');
+    }
   }
 
   async validateAccessToken(token: string) {
