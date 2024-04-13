@@ -13,7 +13,8 @@ CREATE TABLE "User" (
     "password" TEXT NOT NULL,
     "verified" BOOLEAN NOT NULL DEFAULT false,
     "avatar" TEXT,
-    "gender" "Gender" NOT NULL,
+    "gender" "Gender",
+    "phone" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -39,6 +40,9 @@ CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Company_email_key" ON "Company"("email");
 
 -- AddForeignKey
 ALTER TABLE "Company" ADD CONSTRAINT "Company_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
