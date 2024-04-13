@@ -26,7 +26,7 @@ model User {
   password String
   verified Boolean   @default(false)
   avatar   String?
-  gender   Gender
+  gender   Gender?
   phone    String?
   Company  Company[]
 }

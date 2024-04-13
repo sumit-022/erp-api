@@ -13,9 +13,6 @@ export class RegisterDto {
   @IsEmail()
   email: string;
 
-  @IsEnum(Gender)
-  gender: Gender;
-
   @IsString()
   @IsNotEmpty()
   password: string;
