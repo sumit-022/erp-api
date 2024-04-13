@@ -11,6 +11,7 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { Prisma } from '@prisma/client';
 import { Response, Request } from 'express';
+import { log } from 'console';
 
 @Controller('auth')
 export class AuthController {
@@ -39,13 +40,12 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() dto: LoginDto, @Res() res: Response) {
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     try {
       const data = await this.authService.login(dto);
-      res.cookie('token', data.access_token, {
-        httpOnly: true,
-        maxAge: 60 * 60 * 24 * 30 * 1000,
-      });
       return res.json({ message: 'User logged in successfully' });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {

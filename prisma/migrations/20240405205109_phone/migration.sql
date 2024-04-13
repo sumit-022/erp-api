@@ -14,6 +14,7 @@ CREATE TABLE "User" (
     "verified" BOOLEAN NOT NULL DEFAULT false,
     "avatar" TEXT,
     "gender" "Gender" NOT NULL,
+    "phone" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
