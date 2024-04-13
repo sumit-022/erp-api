@@ -15,7 +15,10 @@ export class AuthController {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 30 * 1000,
     });
-    return res.json({ message: 'User registered successfully' });
+    return res.json({
+      message: 'User registered successfully',
+      user: data.user,
+    });
   }
 
   @Post('login')
@@ -29,6 +32,12 @@ export class AuthController {
       message: 'User logged in successfully',
       user: data.user,
     });
+  }
+
+  @Post('logout')
+  async logout(@Res() res: Response) {
+    res.clearCookie('token');
+    return res.json({ message: 'User logged out successfully' });
   }
 
   @Post('validate')
