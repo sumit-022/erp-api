@@ -14,6 +14,9 @@ export class UsersService {
 
   async findOne(id: string) {
     return this.prisma.user.findUnique({
+      select: {
+        password: false,
+      },
       where: { id },
     });
   }

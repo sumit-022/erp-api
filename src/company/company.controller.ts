@@ -1,9 +1,9 @@
-import { Body, Controller, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Req, Res, UseGuards } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { AuthService } from 'src/auth/auth.service';
 import { Post } from '@nestjs/common';
-import { CompanyRegisterDto } from './dto/register.dto';
 import { Request, Response } from 'express';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('company')
 export class CompanyController {
@@ -12,19 +12,28 @@ export class CompanyController {
     private readonly authService: AuthService,
   ) {}
 
+  @UseGuards(AuthGuard)
   @Post('create')
   async create(@Req() req: Request, @Res() res: Response) {
     try {
-      console.log({ tok: req.cookies });
-      const user = await this.authService.validateAccessToken(
-        req.cookies.token,
-      );
+      console.log(req);
+      const user = req.user;
       if (user) {
         await this.companyService.create({ ...req.body, ownerId: user.id });
       }
       return res.json({ message: 'Company created successfully' });
     } catch (error) {
       return res.status(400).send({ message: error.message });
+    }
+  }
+  @Delete('deleteAll')
+  async deleteAll(@Req() req: Request, @Res() res: Response) {
+    const magicWord = req.body.magicWord;
+    try {
+      await this.companyService.removeAll(magicWord);
+      res.status(200).send('All companies deleted');
+    } catch (error) {
+      res.status(400).send(error.message);
     }
   }
 }

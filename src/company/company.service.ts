@@ -7,19 +7,16 @@ export class CompanyService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: CompanyRegisterDto) {
-    return this.prisma.company.create({
-      data: {
-        address: data.address,
-        name: data.name,
-        ownerId: data.ownerId,
-        companyType: data.companyType,
-        contact: data.contact,
-        email: data.email,
-        website: data.website,
-        gstin: data.gstin,
-        logo: data.logo,
-      },
+    const alreadyExists = await this.prisma.company.findUnique({
+      where: { email: data.email },
     });
+    if (alreadyExists) {
+      throw new Error('Company with this email already exists');
+    } else {
+      return this.prisma.company.create({
+        data,
+      });
+    }
   }
 
   async update(id: string, data: any) {
@@ -41,7 +38,41 @@ export class CompanyService {
     });
   }
 
+  async getCompanies(
+    id: string,
+    paginationState: {
+      ord: 'desc' | 'asc';
+      size: number;
+    } & ({ page: number; cursor?: any } | { page?: number; cursor: any }),
+  ) {
+    const { ord, page, size, cursor } = paginationState;
+    const isCursorPagination = cursor !== undefined;
+    if (page < 1) {
+      throw new Error('Page must be greater than 0');
+    }
+    if (size < 1) {
+      throw new Error('Size must be greater than 0');
+    }
+    if (isCursorPagination && page !== undefined) {
+      throw new Error('Cursor pagination should not have page');
+    }
+    if (!isCursorPagination && page === undefined) {
+      throw new Error('Page should be provided for page based pagination');
+    }
+
+    return this.prisma.company.findMany({
+      where: { ownerId: id },
+      cursor: isCursorPagination ? { id: cursor } : undefined,
+      skip: isCursorPagination ? 0 : (page - 1) * size,
+      take: size,
+      orderBy: {
+        name: ord,
+      },
+    });
+  }
+
   async removeAll(magicWord: string) {
+    if (!magicWord) throw new Error('Magic Word is required');
     if (magicWord == 'rapchik') {
       return this.prisma.company.deleteMany();
     } else {
