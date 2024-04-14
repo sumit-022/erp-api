@@ -16,7 +16,6 @@ export class CompanyController {
   @Post('create')
   async create(@Req() req: Request, @Res() res: Response) {
     try {
-      console.log(req);
       const user = req.user;
       if (user) {
         await this.companyService.create({ ...req.body, ownerId: user.id });
@@ -26,6 +25,19 @@ export class CompanyController {
       return res.status(400).send({ message: error.message });
     }
   }
+  @UseGuards(AuthGuard)
+  @Delete('delete/:id')
+  async delete(@Req() req: Request, @Res() res: Response) {
+    const userId = req.user.id;
+    const companyId = req.params.id;
+    try {
+      await this.companyService.remove(companyId, userId);
+      res.status(200).send('Company deleted');
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+  }
+
   @Delete('deleteAll')
   async deleteAll(@Req() req: Request, @Res() res: Response) {
     const magicWord = req.body.magicWord;

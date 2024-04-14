@@ -32,9 +32,18 @@ export class CompanyService {
     });
   }
 
-  async remove(id: string) {
+  async remove(companyId: string, userId: string) {
+    const company = await this.prisma.company.findUnique({
+      where: { id: companyId },
+    });
+    if (!company) {
+      throw new Error('Company not found');
+    }
+    if (company.ownerId !== userId) {
+      throw new Error('You are not authorized to delete this company');
+    }
     return this.prisma.company.delete({
-      where: { id },
+      where: { id: companyId },
     });
   }
 

@@ -50,8 +50,22 @@ export class AuthService {
   }
 
   async register(data: RegisterDto) {
-    try {
-      const { name, username, email } = data;
+    const { name, username, email } = data;
+    const userExists = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          {
+            email,
+          },
+          {
+            username,
+          },
+        ],
+      },
+    });
+    if (userExists) {
+      throw new UnauthorizedException('User already exists');
+    } else {
       const password = await hash(data.password, 10);
       const user = await this.prisma.user.create({
         data: {
@@ -76,8 +90,6 @@ export class AuthService {
           username: user.username,
         },
       };
-    } catch (error) {
-      throw new UnauthorizedException('Invalid data');
     }
   }
 
