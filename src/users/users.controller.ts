@@ -31,7 +31,7 @@ export class UsersController {
     const query = req.query;
 
     const page = query.page ? parseInt(query.page as string) : 1;
-    const size = query.size ? parseInt(query.size as string) : 10;
+    const limit = query.size ? parseInt(query.size as string) : 10;
     const ord = query.ord === 'desc' ? query.ord : 'asc';
     const cursor = query.cursor ? query.cursor : undefined;
 
@@ -40,7 +40,7 @@ export class UsersController {
       if (user) {
         const companies = await this.companyService.getCompanies(user.id, {
           page,
-          size,
+          limit,
           ord,
           cursor,
         });

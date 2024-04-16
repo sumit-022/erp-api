@@ -51,15 +51,15 @@ export class CompanyService {
     id: string,
     paginationState: {
       ord: 'desc' | 'asc';
-      size: number;
+      limit: number;
     } & ({ page: number; cursor?: any } | { page?: number; cursor: any }),
   ) {
-    const { ord, page, size, cursor } = paginationState;
+    const { ord, page, limit, cursor } = paginationState;
     const isCursorPagination = cursor !== undefined;
     if (page < 1) {
       throw new Error('Page must be greater than 0');
     }
-    if (size < 1) {
+    if (limit < 1) {
       throw new Error('Size must be greater than 0');
     }
     if (isCursorPagination && page !== undefined) {
@@ -68,16 +68,27 @@ export class CompanyService {
     if (!isCursorPagination && page === undefined) {
       throw new Error('Page should be provided for page based pagination');
     }
-
-    return this.prisma.company.findMany({
+    const companies = await this.prisma.company.findMany({
       where: { ownerId: id },
       cursor: isCursorPagination ? { id: cursor } : undefined,
-      skip: isCursorPagination ? 0 : (page - 1) * size,
-      take: size,
+      skip: isCursorPagination ? 0 : (page - 1) * limit,
+      take: limit,
       orderBy: {
         name: ord,
       },
     });
+    const count = await this.prisma.company.count({
+      where: { ownerId: id },
+    });
+    return {
+      companies,
+      meta: {
+        total: count,
+        page: page || 1,
+        limit,
+        totalPages: Math.ceil(count / limit),
+      },
+    };
   }
 
   async removeAll(magicWord: string) {
