@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CompanyRegisterDto } from './dto/register.dto';
 
@@ -27,9 +27,14 @@ export class CompanyService {
   }
 
   async findOne(id: string) {
-    return this.prisma.company.findUnique({
-      where: { id },
-    });
+    try {
+      if (!id) throw new Error('Company ID is required');
+      return this.prisma.company.findUnique({
+        where: { id },
+      });
+    } catch (error) {
+      throw new UnauthorizedException('Company not found');
+    }
   }
 
   async remove(companyId: string, userId: string) {

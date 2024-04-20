@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { AuthService } from 'src/auth/auth.service';
 import { Post } from '@nestjs/common';
@@ -25,6 +33,18 @@ export class CompanyController {
       return res.status(400).send({ message: error.message });
     }
   }
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  async findOne(@Req() req: Request, @Res() res: Response) {
+    const companyId = req.params.id;
+    try {
+      const company = await this.companyService.findOne(companyId);
+      return res.json(company);
+    } catch (error) {
+      return res.status(400).send(error.message);
+    }
+  }
+
   @UseGuards(AuthGuard)
   @Delete('delete/:id')
   async delete(@Req() req: Request, @Res() res: Response) {
